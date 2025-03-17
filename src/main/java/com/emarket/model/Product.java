@@ -6,7 +6,6 @@ import lombok.Data;
 import java.util.Date;
 
 @Entity
-@Table(name = "Product")
 @Data
 public class Product {
     @Id
