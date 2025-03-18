@@ -1,0 +1,26 @@
+version: "3.9"
+services:
+  emarket:
+    build: .
+    image: emarket_app:latest
+    container_name: emarket_app_container
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: "emarket"
+      POSTGRES_USER: "emarketuser"
+      POSTGRES_PASSWORD: "123"
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - ./src/main/resources/sql:/docker-entrypoint-initdb.d
+      - emarket-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+volumes:
+  emarket-data:
