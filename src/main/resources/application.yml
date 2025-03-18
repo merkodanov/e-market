@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: e-market
+  datasource:
+    url: "jdbc:postgresql://localhost:5433/emarket"
+    username: emarketuser
+    password: 123
