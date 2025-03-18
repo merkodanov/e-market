@@ -14,6 +14,7 @@ public class Product {
     private String title;
     private String description;
     private Date createdAt = new Date();
+    private float rating;
     private float price;
 
     private int userId;
