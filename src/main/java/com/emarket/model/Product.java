@@ -18,4 +18,17 @@ public class Product {
     private float price;
 
     private int userId;
+
+    public Product(int userId, float price, float rating, Date createdAt, String description, String title) {
+        this.userId = userId;
+        this.price = price;
+        this.rating = rating;
+        this.createdAt = createdAt;
+        this.description = description;
+        this.title = title;
+    }
+
+    protected Product() {
+
+    }
 }
