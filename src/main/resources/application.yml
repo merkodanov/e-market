@@ -1,6 +1,28 @@
 spring:
   application:
     name: e-market
+  profiles:
+    active: dev
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: "jdbc:postgresql://localhost:5432/e-market"
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
   datasource:
     url: "jdbc:postgresql://db:5432/emarket"
     username: emarketuser
@@ -11,7 +33,3 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-
-
-server:
-  port: 8080
