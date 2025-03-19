@@ -1,10 +1,12 @@
 services:
   db:
     image: postgres:17-alpine
+    env_file:
+      - .env
     environment:
-      POSTGRES_DB: "emarket"
-      POSTGRES_USER: "emarketuser"
-      POSTGRES_PASSWORD: "123"
+      POSTGRES_DB: "${DB_NAME_PROD}"
+      POSTGRES_USER: "${DB_USER_PROD}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD_PROD}"
       PGDATA: "/var/lib/postgresql/data/pgdatamarket"
     volumes:
       - ./src/main/resources/sql:/docker-entrypoint-initdb.d
@@ -15,6 +17,12 @@ services:
     build: .
     image: emarket_app:latest
     container_name: emarket_app_container
+    env_file:
+      - .env
+    environment:
+      DB_NAME_PROD: ${DB_NAME_PROD}
+      DB_USER_PROD: ${DB_USER_PROD}
+      DB_PASSWORD_PROD: ${DB_PASSWORD_PROD}
     ports:
       - "8080:8080"
     depends_on:
