@@ -12,6 +12,7 @@ public class ProductReview {
     public String title;
     public Rating rating;
     public String body;
+    public int userId;
 
     @ManyToOne
     public Product product;

@@ -17,15 +17,12 @@ public class Product {
     private float rating;
     private float price;
 
-    private int userId;
-
-    public Product(int userId, float price, float rating, Date createdAt, String description, String title) {
-        this.userId = userId;
-        this.price = price;
-        this.rating = rating;
-        this.createdAt = createdAt;
-        this.description = description;
+    public Product(String title, String description, Date createdAt, float rating, float price) {
         this.title = title;
+        this.description = description;
+        this.createdAt = createdAt;
+        this.rating = rating;
+        this.price = price;
     }
 
     protected Product() {

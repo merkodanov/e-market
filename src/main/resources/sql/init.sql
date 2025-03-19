@@ -6,7 +6,6 @@ CREATE TABLE product
     created_at  TIMESTAMP WITHOUT TIME ZONE,
     rating      FLOAT                                   NOT NULL,
     price       FLOAT                                   NOT NULL,
-    user_id     INTEGER                                 NOT NULL,
     CONSTRAINT pk_product PRIMARY KEY (id)
 );
 
@@ -16,6 +15,7 @@ CREATE TABLE product_review
     title      VARCHAR(255),
     rating     SMALLINT,
     body       VARCHAR(255),
+    user_id    INTEGER                                 NOT NULL,
     product_id BIGINT,
     CONSTRAINT pk_productreview PRIMARY KEY (id)
 );
