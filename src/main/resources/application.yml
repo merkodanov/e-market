@@ -2,7 +2,7 @@ spring:
   application:
     name: e-market
   profiles:
-    active: ${PROFILE:dev}
+    active: dev
 ---
 spring:
   config:
