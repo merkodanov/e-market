@@ -3,7 +3,7 @@ COPY .mvn .mvn
 COPY mvnw .
 COPY pom.xml .
 COPY src src
-RUN ./mvnw -B -DPROFILE=prod package
+RUN ./mvnw -DskipTests package
 
 FROM openjdk:23
 LABEL authors="Vlad"
