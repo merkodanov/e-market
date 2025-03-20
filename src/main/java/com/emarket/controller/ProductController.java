@@ -2,17 +2,15 @@ package com.emarket.controller;
 
 import com.emarket.model.Product;
 import com.emarket.service.ProductService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
-
-    public ProductController(ProductService productService) {
-        this.productService = productService;
-    }
 
     @GetMapping("/product/{id}")
     public ResponseEntity<Product> getProduct(@PathVariable long id) {
