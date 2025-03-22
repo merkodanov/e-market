@@ -6,8 +6,9 @@ import lombok.Data;
 import java.util.Date;
 
 @Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 @Data
-public class Product {
+public abstract class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -16,16 +17,4 @@ public class Product {
     private Date createdAt = new Date();
     private float rating;
     private float price;
-
-    public Product(String title, String description, Date createdAt, float rating, float price) {
-        this.title = title;
-        this.description = description;
-        this.createdAt = createdAt;
-        this.rating = rating;
-        this.price = price;
-    }
-
-    protected Product() {
-
-    }
 }
