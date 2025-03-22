@@ -1,11 +1,14 @@
 package com.emarket.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 import lombok.Data;
 
-@Entity
+@MappedSuperclass
 @Data
-public class ProductReview {
+public abstract class ProductReview {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public long id;
@@ -13,8 +16,5 @@ public class ProductReview {
     public Rating rating;
     public String body;
     public int userId;
-
-    @ManyToOne
-    public Product product;
 }
 
