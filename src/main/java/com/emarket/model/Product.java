@@ -10,7 +10,7 @@ import java.util.Date;
 @Data
 public abstract class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     private String title;
     private String description;
