@@ -1,13 +1,18 @@
 package com.emarket.service;
 
 import com.emarket.model.Clothing;
+import com.emarket.repository.ClothingRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class ClothingService {
+    private final ClothingRepository clothingRepository;
+
     public Optional<Clothing> findById(long id) {
-        return Optional.empty();
+        return clothingRepository.findById(id);
     }
 }
