@@ -25,7 +25,7 @@ public class ClothingController {
         if (clothing.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        ClothingResponseDto clothingResponseDto = ClothingMapper.toResponseDto(clothing.orElse(null));
+        ClothingResponseDto clothingResponseDto = ClothingMapper.toResponseDto(clothing.get());
 
         return ResponseEntity.ok().body(clothingResponseDto);
     }
