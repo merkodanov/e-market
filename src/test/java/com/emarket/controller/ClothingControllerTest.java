@@ -119,4 +119,12 @@ class ClothingControllerTest {
         Assertions.assertEquals(clothes.stream().map(ClothingMapper::toResponseDto).toList(),
                 clothingResponseDto);
     }
+
+    @Test
+    void getAllClothes_Is_Not_Found() throws Exception {
+        Mockito.when(clothingService.findAllClothes()).thenReturn(new ArrayList<>());
+
+        mockMvc.perform(get("/clothes"))
+                .andExpect(status().isNoContent());
+    }
 }

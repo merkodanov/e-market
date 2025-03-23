@@ -52,6 +52,9 @@ public class ClothingController {
                                                                               String size) {
         if (color == null && size == null) {
             List<Clothing> clothing = clothingService.findAllClothes();
+            if (clothing.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
             return ResponseEntity.ok(clothing.stream().map(ClothingMapper::toResponseDto).toList());
         }
         List<Clothing> clothes = clothingService.findByColorAndSize(color, size);
