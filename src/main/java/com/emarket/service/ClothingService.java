@@ -7,6 +7,7 @@ import com.emarket.repository.ClothingSizeColorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,6 +30,10 @@ public class ClothingService {
     }
 
     public List<Clothing> findAllClothes() {
-        return null;
+        List<Clothing> clothing = new ArrayList<>();
+        Iterable<Clothing> clothingIterable = clothingRepository.findAll();
+        clothingIterable.forEach(clothing::add);
+
+        return clothing;
     }
 }

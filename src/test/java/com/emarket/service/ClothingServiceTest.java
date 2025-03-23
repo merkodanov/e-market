@@ -55,4 +55,14 @@ class ClothingServiceTest {
         Assertions.assertEquals(clothingList.getFirst().getTitle(),
                 clothingSizeColors.getFirst().getClothing().getTitle());
     }
+
+    @Test
+    void getAllClothing_Is_Success() {
+        Clothing clothing = new Clothing("t", "d", 1, 1);
+        Mockito.when(clothingRepository.findAll()).thenReturn(List.of(clothing));
+
+        List<Clothing> clothingList = clothingService.findAllClothes();
+
+        Assertions.assertEquals(clothing, clothingList.getFirst());
+    }
 }
