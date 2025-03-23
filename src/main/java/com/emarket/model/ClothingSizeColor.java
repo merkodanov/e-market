@@ -24,4 +24,14 @@ public class ClothingSizeColor {
     @ManyToOne
     @JoinColumn(name = "color_id", nullable = false)
     private Color color;
+
+    public ClothingSizeColor(Clothing clothing, Size size, Color color) {
+        this.clothing = clothing;
+        this.size = size;
+        this.color = color;
+    }
+
+    protected ClothingSizeColor() {
+
+    }
 }
