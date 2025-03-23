@@ -19,4 +19,15 @@ public abstract class Product {
     private Date createdAt = new Date();
     private float rating;
     private float price;
+
+    public Product(String title, String description, float rating, float price) {
+        this.title = title;
+        this.description = description;
+        this.rating = rating;
+        this.price = price;
+    }
+
+    protected Product() {
+
+    }
 }
