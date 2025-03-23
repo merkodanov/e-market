@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/clothing")
@@ -19,8 +21,11 @@ public class ClothingController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ClothingResponseDto> getClothingResponseDto(@PathVariable long id) {
-        Clothing clothing = clothingService.findById(id);
-        ClothingResponseDto clothingResponseDto = ClothingMapper.toResponseDto(clothing);
+        Optional<Clothing> clothing = clothingService.findById(id);
+        if (clothing.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        ClothingResponseDto clothingResponseDto = ClothingMapper.toResponseDto(clothing.orElse(null));
 
         return ResponseEntity.ok().body(clothingResponseDto);
     }

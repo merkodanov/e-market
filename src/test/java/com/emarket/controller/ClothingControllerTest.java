@@ -15,6 +15,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.util.Optional;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -29,12 +31,12 @@ class ClothingControllerTest {
     private ClothingService clothingService;
 
     @Test
-    void getClothingResponseDTO_Is_Success() throws Exception {
+    void getResponseDto_Is_Success() throws Exception {
         Clothing clothing = new Clothing("title", "description", 1, 1);
         long id = 1;
         clothing.setId(id);
         ClothingResponseDto clothingResponseDto = ClothingMapper.toResponseDto(clothing);
-        Mockito.when(clothingService.findById(id)).thenReturn(clothing);
+        Mockito.when(clothingService.findById(id)).thenReturn(Optional.of(clothing));
 
         MvcResult result = mockMvc.perform(get("/clothing/{id}", id))
                 .andExpect(status().isOk())
@@ -49,4 +51,12 @@ class ClothingControllerTest {
         Assertions.assertEquals(clothingResponseDto, actualClothingResponseDto);
     }
 
+    @Test
+    void getResponseDto_Is_Not_Found() throws Exception {
+        long id = 1;
+        Mockito.when(clothingService.findById(id)).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/clothing/{id}", id))
+                .andExpect(status().isNotFound());
+    }
 }

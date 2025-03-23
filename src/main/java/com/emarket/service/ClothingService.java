@@ -3,9 +3,11 @@ package com.emarket.service;
 import com.emarket.model.Clothing;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class ClothingService {
-    public Clothing findById(long id) {
-        return null;
+    public Optional<Clothing> findById(long id) {
+        return Optional.empty();
     }
 }
