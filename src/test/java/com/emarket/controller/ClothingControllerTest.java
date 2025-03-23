@@ -19,7 +19,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -85,7 +84,7 @@ class ClothingControllerTest {
                 .getContentAsString(), new TypeReference<>() {
         });
 
-        Assertions.assertEquals(clothingList.stream().map(ClothingMapper::toResponseDto).collect(Collectors.toList()),
+        Assertions.assertEquals(clothingList.stream().map(ClothingMapper::toResponseDto).toList(),
                 responseDtoList);
     }
 
@@ -99,5 +98,25 @@ class ClothingControllerTest {
                         .param("color", color)
                         .param("size", size))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void getAllClothes_Is_Success() throws Exception {
+        List<Clothing> clothes = List.of(new Clothing("title", "des", 1, 1));
+        Mockito.when(clothingService.findAllClothes()).thenReturn(clothes);
+
+        MvcResult result = mockMvc.perform(get("/clothes"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andReturn();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<ClothingResponseDto> clothingResponseDto = objectMapper.readValue(
+                result.getResponse().getContentAsString(),
+                new TypeReference<>() {
+                });
+
+        Assertions.assertEquals(clothes.stream().map(ClothingMapper::toResponseDto).toList(),
+                clothingResponseDto);
     }
 }

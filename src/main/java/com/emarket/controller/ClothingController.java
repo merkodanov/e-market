@@ -10,7 +10,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,8 +46,14 @@ public class ClothingController {
             @ApiResponse(responseCode = "200", description = "Одежда найдена"),
             @ApiResponse(responseCode = "204", description = "Одежда не найдена")
     })
-    public ResponseEntity<List<ClothingResponseDto>> getClothesByColorAndSize(@RequestParam String color,
-                                                                              @RequestParam String size) {
+    public ResponseEntity<List<ClothingResponseDto>> getClothesByColorAndSize(@RequestParam(required = false)
+                                                                              String color,
+                                                                              @RequestParam(required = false)
+                                                                              String size) {
+        if (color == null && size == null) {
+            List<Clothing> clothing = clothingService.findAllClothes();
+            return ResponseEntity.ok(clothing.stream().map(ClothingMapper::toResponseDto).toList());
+        }
         List<Clothing> clothes = clothingService.findByColorAndSize(color, size);
         if (clothes.isEmpty()) {
             return ResponseEntity.noContent().build();

@@ -27,4 +27,8 @@ public class ClothingService {
 
         return clothingSizeColorList.stream().map(ClothingSizeColor::getClothing).collect(Collectors.toList());
     }
+
+    public List<Clothing> findAllClothes() {
+        return null;
+    }
 }
