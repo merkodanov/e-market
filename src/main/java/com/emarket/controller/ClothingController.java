@@ -1,0 +1,27 @@
+package com.emarket.controller;
+
+import com.emarket.dto.ClothingResponseDto;
+import com.emarket.mapper.ClothingMapper;
+import com.emarket.service.ClothingService;
+import com.emarket.model.Clothing;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/clothing")
+public class ClothingController {
+    private final ClothingService clothingService;
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ClothingResponseDto> getClothingResponseDto(@PathVariable long id) {
+        Clothing clothing = clothingService.findById(id);
+        ClothingResponseDto clothingResponseDto = ClothingMapper.toResponseDto(clothing);
+
+        return ResponseEntity.ok().body(clothingResponseDto);
+    }
+}
