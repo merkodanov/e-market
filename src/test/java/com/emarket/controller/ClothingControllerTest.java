@@ -4,6 +4,7 @@ import com.emarket.dto.ClothingResponseDto;
 import com.emarket.mapper.ClothingMapper;
 import com.emarket.model.Clothing;
 import com.emarket.service.ClothingService;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -15,11 +16,13 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ClothingController.class)
 class ClothingControllerTest {
@@ -57,6 +60,44 @@ class ClothingControllerTest {
         Mockito.when(clothingService.findById(id)).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/clothing/{id}", id))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void getClothes_By_Size_And_Color_Is_Success() throws Exception {
+        List<Clothing> clothingList = List.of(
+                new Clothing("title", "description", 1, 1),
+                new Clothing("title 2", "description 2", 2, 3));
+        String color = "blue";
+        String size = "small";
+        Mockito.when(clothingService.findByColorAndSize(color, size)).thenReturn(clothingList);
+
+        MvcResult mvcResult = mockMvc.perform(get("/clothes")
+                        .param("color", color)
+                        .param("size", size))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.length()").value(2))
+                .andReturn();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<ClothingResponseDto> responseDtoList = objectMapper.readValue(mvcResult.getResponse()
+                .getContentAsString(), new TypeReference<>() {
+        });
+
+        Assertions.assertEquals(clothingList.stream().map(ClothingMapper::toResponseDto).collect(Collectors.toList()),
+                responseDtoList);
+    }
+
+    @Test
+    void getClothes_By_Size_And_Color_Is_Not_Found() throws Exception {
+        String color = "blue";
+        String size = "small";
+        Mockito.when(clothingService.findByColorAndSize(color, size)).thenReturn(new ArrayList<>());
+
+        mockMvc.perform(get("/clothes")
+                        .param("color", color)
+                        .param("size", size))
+                .andExpect(status().isNoContent());
     }
 }

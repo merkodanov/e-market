@@ -5,6 +5,7 @@ import com.emarket.repository.ClothingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -14,5 +15,9 @@ public class ClothingService {
 
     public Optional<Clothing> findById(long id) {
         return clothingRepository.findById(id);
+    }
+
+    public List<Clothing> findByColorAndSize(String color, String size) {
+        return null;
     }
 }
