@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @Tag(name = "Clothing controller",
@@ -51,18 +50,23 @@ public class ClothingController {
                                                                               @RequestParam(required = false)
                                                                               String size) {
         if (color == null && size == null) {
-            List<Clothing> clothing = clothingService.findAllClothes();
-            if (clothing.isEmpty()) {
-                return ResponseEntity.noContent().build();
-            }
-            return ResponseEntity.ok(clothing.stream().map(ClothingMapper::toResponseDto).toList());
-        }
-        List<Clothing> clothes = clothingService.findByColorAndSize(color, size);
-        if (clothes.isEmpty()) {
-            return ResponseEntity.noContent().build();
+            List<Clothing> clothes = clothingService.findAllClothes();
+            return clothes.isEmpty()
+                    ? ResponseEntity.noContent().build()
+                    : ResponseEntity.ok(clothes.stream().map(ClothingMapper::toResponseDto).toList());
         }
 
-        return ResponseEntity.ok(clothes.stream().map(ClothingMapper::toResponseDto).collect(Collectors.toList()));
+        if (color == null || size == null) {
+            List<Clothing> clothes = clothingService.findByColorOrSize(color, size);
+            return clothes.isEmpty()
+                    ? ResponseEntity.noContent().build()
+                    : ResponseEntity.ok(clothes.stream().map(ClothingMapper::toResponseDto).toList());
+        }
+
+        List<Clothing> clothes = clothingService.findByColorAndSize(color, size);
+        return clothes.isEmpty()
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.ok(clothes.stream().map(ClothingMapper::toResponseDto).toList());
     }
 
 }

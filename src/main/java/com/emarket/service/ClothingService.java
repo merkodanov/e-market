@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +25,7 @@ public class ClothingService {
         List<ClothingSizeColor> clothingSizeColorList = clothingSizeColorRepository.
                 findClothingSizeColorByColorNameAndSizeName(color, size);
 
-        return clothingSizeColorList.stream().map(ClothingSizeColor::getClothing).collect(Collectors.toList());
+        return clothingSizeColorList.stream().map(ClothingSizeColor::getClothing).toList();
     }
 
     public List<Clothing> findAllClothes() {
@@ -35,5 +34,12 @@ public class ClothingService {
         clothingIterable.forEach(clothing::add);
 
         return clothing;
+    }
+
+    public List<Clothing> findByColorOrSize(String color, String size) {
+        List<ClothingSizeColor> clothingSizeColors = clothingSizeColorRepository
+                .findClothingSizeColorByColorNameOrSizeName(color, size);
+
+        return clothingSizeColors.stream().map(ClothingSizeColor::getClothing).toList();
     }
 }

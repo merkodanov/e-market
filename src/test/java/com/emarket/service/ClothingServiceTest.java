@@ -65,4 +65,19 @@ class ClothingServiceTest {
 
         Assertions.assertEquals(clothing, clothingList.getFirst());
     }
+
+    @Test
+    void getClothing_By_Size_Or_Color_Is_Success() {
+        String color = "color";
+        List<ClothingSizeColor> clothingSizeColors = List.of(new ClothingSizeColor(
+                new Clothing("t", "d", 1, 1),
+                new Size(), new Color()
+        ));
+        Mockito.when(clothingSizeColorRepository.findClothingSizeColorByColorNameOrSizeName(color, null))
+                .thenReturn(clothingSizeColors);
+
+        List<Clothing> clothing = clothingService.findByColorOrSize(color, null);
+
+        Assertions.assertEquals(clothingSizeColors.getFirst().getClothing(), clothing.getFirst());
+    }
 }

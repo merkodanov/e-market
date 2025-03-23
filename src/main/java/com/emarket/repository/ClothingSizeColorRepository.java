@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface ClothingSizeColorRepository extends CrudRepository<ClothingSizeColor, Long> {
     List<ClothingSizeColor> findClothingSizeColorByColorNameAndSizeName(String color, String size);
+
+    List<ClothingSizeColor> findClothingSizeColorByColorNameOrSizeName(String color, String size);
 }

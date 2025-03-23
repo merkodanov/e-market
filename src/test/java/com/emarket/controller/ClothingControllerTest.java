@@ -127,4 +127,38 @@ class ClothingControllerTest {
         mockMvc.perform(get("/clothes"))
                 .andExpect(status().isNoContent());
     }
+
+    @Test
+    void getClothes_By_Size_Or_Color_Is_Success() throws Exception {
+        String color = "blue";
+        List<Clothing> clothingList = List.of(new Clothing("t", "d", 1, 2));
+        Mockito.when(clothingService.findByColorOrSize(color, null)).thenReturn(
+                clothingList);
+
+        MvcResult result = mockMvc.perform(get("/clothes")
+                        .param("color", color)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andReturn();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<ClothingResponseDto> clothingResponseDto = objectMapper.readValue(
+                result.getResponse().getContentAsString(),
+                new TypeReference<>() {
+                }
+        );
+        Assertions.assertEquals(clothingList.stream().map(ClothingMapper::toResponseDto).toList(),
+                clothingResponseDto);
+    }
+
+    @Test
+    void getClothes_By_Size_Or_Color_Is_Not_Found() throws Exception {
+        String color = "color";
+        Mockito.when(clothingService.findByColorOrSize(color, null)).thenReturn(new ArrayList<>());
+
+        mockMvc.perform(get("/clothes")
+                        .param("color", color))
+                .andExpect(status().isNoContent());
+    }
 }
