@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Entity
 @Data
-public class Size {
+public class Color {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
