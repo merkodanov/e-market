@@ -2,6 +2,7 @@ package com.emarket.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -11,7 +12,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
-@Configuration(proxyBeanMethods = false)
+@Configuration
 @EnableWebSecurity
 public class CorsConfig {
     @Bean
@@ -22,8 +23,8 @@ public class CorsConfig {
                         authorize
                                 .anyRequest().permitAll()
                 )
-                .cors(
-                cors -> cors.configurationSource(corsConfigurationSource)).build();
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
+                .build();
     }
 
     @Bean
@@ -31,9 +32,9 @@ public class CorsConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.addAllowedHeader("Access-Control-Allow-Origin");
-        config.addAllowedHeader("*");
+        config.addAllowedHeader(HttpHeaders.CONTENT_TYPE);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "HEAD", "DELETE", "OPTIONS"));
-        config.setAllowedOrigins(List.of("localhost:5173", "127.0.0.1:5173"));
+        config.setAllowedOrigins(List.of("http://localhost:5173", "http://127.0.0.1:5173"));
         config.setAllowCredentials(true);
         source.registerCorsConfiguration("/**", config);
         return source;
