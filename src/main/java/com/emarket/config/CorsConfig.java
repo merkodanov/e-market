@@ -17,7 +17,12 @@ public class CorsConfig {
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource)
             throws Exception {
-        return http.cors(
+        return http
+                .authorizeHttpRequests(authorize ->
+                        authorize
+                                .anyRequest().permitAll()
+                )
+                .cors(
                 cors -> cors.configurationSource(corsConfigurationSource)).build();
     }
 
