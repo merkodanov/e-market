@@ -21,9 +21,9 @@ public class ClothingService {
         return clothingRepository.findById(id);
     }
 
-    public List<Clothing> findByColorAndSize(String color, String size) {
+    public List<Clothing> findByColorAndSize(List<String> color, List<String> size) {
         List<ClothingSizeColor> clothingSizeColorList = clothingSizeColorRepository.
-                findClothingSizeColorByColorNameAndSizeName(color, size);
+                findClothingSizeColorByColorNameInAndSizeNameIn(color, size);
 
         return clothingSizeColorList.stream().map(ClothingSizeColor::getClothing).toList();
     }
@@ -36,9 +36,9 @@ public class ClothingService {
         return clothing;
     }
 
-    public List<Clothing> findByColorOrSize(String color, String size) {
+    public List<Clothing> findByColorOrSize(List<String> color, List<String> size) {
         List<ClothingSizeColor> clothingSizeColors = clothingSizeColorRepository
-                .findClothingSizeColorByColorNameOrSizeName(color, size);
+                .findClothingSizeColorByColorNameInOrSizeNameIn(color, size);
 
         return clothingSizeColors.stream().map(ClothingSizeColor::getClothing).toList();
     }

@@ -69,13 +69,13 @@ class ClothingControllerTest {
         List<Clothing> clothingList = List.of(
                 new Clothing("title", "description", 1, 1),
                 new Clothing("title 2", "description 2", 2, 3));
-        String color = "blue";
-        String size = "small";
+        List<String> color = List.of("blue", "red");
+        List<String> size = List.of("small", "big");
         Mockito.when(clothingService.findByColorAndSize(color, size)).thenReturn(clothingList);
 
         MvcResult mvcResult = mockMvc.perform(get("/clothes")
-                        .param("color", color)
-                        .param("size", size))
+                        .param("color", String.join(",", color))
+                        .param("size", String.join(",", size)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(2))
@@ -92,13 +92,13 @@ class ClothingControllerTest {
 
     @Test
     void getClothes_By_Size_And_Color_Is_Not_Found() throws Exception {
-        String color = "blue";
-        String size = "small";
+        List<String> color = List.of("blue", "red");
+        List<String> size = List.of("small", "big");
         Mockito.when(clothingService.findByColorAndSize(color, size)).thenReturn(new ArrayList<>());
 
         mockMvc.perform(get("/clothes")
-                        .param("color", color)
-                        .param("size", size))
+                        .param("color", String.join(",", color))
+                        .param("size", String.join(",", size)))
                 .andExpect(status().isNoContent());
     }
 
@@ -132,13 +132,13 @@ class ClothingControllerTest {
 
     @Test
     void getClothes_By_Size_Or_Color_Is_Success() throws Exception {
-        String color = "blue";
+        List<String> color = List.of("blue", "red");
         List<Clothing> clothingList = List.of(new Clothing("t", "d", 1, 2));
         Mockito.when(clothingService.findByColorOrSize(color, null)).thenReturn(
                 clothingList);
 
         MvcResult result = mockMvc.perform(get("/clothes")
-                        .param("color", color)
+                        .param("color", String.join(",", color))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(1))
@@ -156,11 +156,11 @@ class ClothingControllerTest {
 
     @Test
     void getClothes_By_Size_Or_Color_Is_Not_Found() throws Exception {
-        String color = "color";
+        List<String> color = List.of("color");
         Mockito.when(clothingService.findByColorOrSize(color, null)).thenReturn(new ArrayList<>());
 
         mockMvc.perform(get("/clothes")
-                        .param("color", color))
+                        .param("color", String.join(",", color)))
                 .andExpect(status().isNoContent());
     }
 }

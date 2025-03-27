@@ -46,9 +46,9 @@ public class ClothingController {
             @ApiResponse(responseCode = "204", description = "Одежда не найдена")
     })
     public ResponseEntity<List<ClothingResponseDto>> getClothesByColorAndSize(@RequestParam(required = false)
-                                                                              String color,
+                                                                                  List<String> color,
                                                                               @RequestParam(required = false)
-                                                                              String size) {
+                                                                                  List<String> size) {
         if (color == null && size == null) {
             List<Clothing> clothes = clothingService.findAllClothes();
             return clothes.isEmpty()
