@@ -5,6 +5,7 @@ import com.emarket.mapper.ClothingMapper;
 import com.emarket.model.Clothing;
 import com.emarket.service.ClothingService;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -12,17 +13,21 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ClothingController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -71,60 +76,76 @@ class ClothingControllerTest {
                 new Clothing("title 2", "description 2", 2, 3));
         List<String> color = List.of("blue", "red");
         List<String> size = List.of("small", "big");
-        Mockito.when(clothingService.findByColorAndSize(color, size)).thenReturn(clothingList);
+        int offset = 0;
+        int limit = 1;
+        Pageable pageable = PageRequest.of(offset, limit);
+        Page<Clothing> page = new PageImpl<>(clothingList);
+        Mockito.when(clothingService.findByColorAndSize(color, size, pageable)).thenReturn(page);
 
         MvcResult mvcResult = mockMvc.perform(get("/clothes")
                         .param("color", String.join(",", color))
-                        .param("size", String.join(",", size)))
+                        .param("size", String.join(",", size))
+                        .param("offset", String.valueOf(offset))
+                        .param("limit", String.valueOf(limit)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.length()").value(2))
                 .andReturn();
 
         ObjectMapper objectMapper = new ObjectMapper();
-        List<ClothingResponseDto> responseDtoList = objectMapper.readValue(mvcResult.getResponse()
-                .getContentAsString(), new TypeReference<>() {
+        JsonNode rootNode = objectMapper.readTree(mvcResult.getResponse().getContentAsString());
+        JsonNode contentNode = rootNode.get("content");
+        List<ClothingResponseDto> clothingResponse = objectMapper.readValue(contentNode.toString(), new TypeReference<>() {
         });
 
-        Assertions.assertEquals(clothingList.stream().map(ClothingMapper::toResponseDto).toList(),
-                responseDtoList);
+        Assertions.assertEquals(clothingList.stream().map(ClothingMapper::toResponseDto).toList(), clothingResponse);
     }
 
     @Test
     void getClothes_By_Size_And_Color_Is_Not_Found() throws Exception {
         List<String> color = List.of("blue", "red");
         List<String> size = List.of("small", "big");
-        Mockito.when(clothingService.findByColorAndSize(color, size)).thenReturn(new ArrayList<>());
+        int offset = 0;
+        int limit = 10;
+        Pageable pageable = PageRequest.of(offset, limit);
+        Mockito.when(clothingService.findByColorAndSize(color, size, pageable)).thenReturn(Page.empty());
 
         mockMvc.perform(get("/clothes")
                         .param("color", String.join(",", color))
-                        .param("size", String.join(",", size)))
+                        .param("size", String.join(",", size))
+                )
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void getAllClothes_Is_Success() throws Exception {
-        List<Clothing> clothes = List.of(new Clothing("title", "des", 1, 1));
-        Mockito.when(clothingService.findAllClothes()).thenReturn(clothes);
+        Page<Clothing> clothes = new PageImpl<>(List.of(new Clothing("title", "des", 1, 1)));
+        int offset = 0;
+        int limit = 1;
+        Pageable pageable = PageRequest.of(offset, limit);
+        Mockito.when(clothingService.findAllClothes(pageable)).thenReturn(clothes);
 
-        MvcResult result = mockMvc.perform(get("/clothes"))
+        MvcResult result = mockMvc.perform(get("/clothes")
+                        .param("offset", String.valueOf(offset))
+                        .param("limit", String.valueOf(limit)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
                 .andReturn();
 
         ObjectMapper objectMapper = new ObjectMapper();
-        List<ClothingResponseDto> clothingResponseDto = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                new TypeReference<>() {
-                });
+        JsonNode rootNode = objectMapper.readTree(result.getResponse().getContentAsString());
+        JsonNode contentNode = rootNode.get("content");
+        List<ClothingResponseDto> clothingResponseDto = objectMapper.readValue(contentNode.toString(), new TypeReference<>() {
+        });
 
-        Assertions.assertEquals(clothes.stream().map(ClothingMapper::toResponseDto).toList(),
+        Assertions.assertEquals(clothes.map(ClothingMapper::toResponseDto).toList(),
                 clothingResponseDto);
     }
 
     @Test
     void getAllClothes_Is_Not_Found() throws Exception {
-        Mockito.when(clothingService.findAllClothes()).thenReturn(new ArrayList<>());
+        int offset = 0;
+        int limit = 10;
+        Pageable pageable = PageRequest.of(offset, limit);
+        Mockito.when(clothingService.findAllClothes(pageable)).thenReturn(Page.empty());
 
         mockMvc.perform(get("/clothes"))
                 .andExpect(status().isNoContent());
@@ -133,31 +154,35 @@ class ClothingControllerTest {
     @Test
     void getClothes_By_Size_Or_Color_Is_Success() throws Exception {
         List<String> color = List.of("blue", "red");
-        List<Clothing> clothingList = List.of(new Clothing("t", "d", 1, 2));
-        Mockito.when(clothingService.findByColorOrSize(color, null)).thenReturn(
+        Page<Clothing> clothingList = new PageImpl<>(List.of(new Clothing("t", "d", 1, 2)));
+        int offset = 0;
+        int limit = 10;
+        Pageable pageable = PageRequest.of(offset, limit);
+        Mockito.when(clothingService.findByColorOrSize(color, null, pageable)).thenReturn(
                 clothingList);
 
         MvcResult result = mockMvc.perform(get("/clothes")
                         .param("color", String.join(",", color))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
                 .andReturn();
 
         ObjectMapper objectMapper = new ObjectMapper();
-        List<ClothingResponseDto> clothingResponseDto = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                new TypeReference<>() {
-                }
-        );
-        Assertions.assertEquals(clothingList.stream().map(ClothingMapper::toResponseDto).toList(),
+        JsonNode rootNode = objectMapper.readTree(result.getResponse().getContentAsString());
+        JsonNode contentNode = rootNode.get("content");
+        List<ClothingResponseDto> clothingResponseDto = objectMapper.readValue(contentNode.toString(), new TypeReference<>() {
+        });
+        Assertions.assertEquals(clothingList.map(ClothingMapper::toResponseDto).toList(),
                 clothingResponseDto);
     }
 
     @Test
     void getClothes_By_Size_Or_Color_Is_Not_Found() throws Exception {
         List<String> color = List.of("color");
-        Mockito.when(clothingService.findByColorOrSize(color, null)).thenReturn(new ArrayList<>());
+        int offset = 0;
+        int limit = 10;
+        Pageable pageable = PageRequest.of(offset, limit);
+        Mockito.when(clothingService.findByColorOrSize(color, null, pageable)).thenReturn(Page.empty());
 
         mockMvc.perform(get("/clothes")
                         .param("color", String.join(",", color)))

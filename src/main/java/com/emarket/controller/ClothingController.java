@@ -8,6 +8,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,32 +44,40 @@ public class ClothingController {
     }
 
     @GetMapping(value = "/clothes", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Поиск одежды по цвету и размеру", responses = {
+    @Operation(summary = "Поиск одежды по цвету и размеру вместе с пагинацией", responses = {
             @ApiResponse(responseCode = "200", description = "Одежда найдена"),
             @ApiResponse(responseCode = "204", description = "Одежда не найдена")
     })
-    public ResponseEntity<List<ClothingResponseDto>> getClothesByColorAndSize(@RequestParam(required = false)
-                                                                                  List<String> color,
+    public ResponseEntity<Page<ClothingResponseDto>> getClothesByColorAndSize(@RequestParam(required = false)
+                                                                              List<String> color,
                                                                               @RequestParam(required = false)
-                                                                                  List<String> size) {
+                                                                              List<String> size,
+                                                                              @RequestParam(value = "offset",
+                                                                                      defaultValue = "0")
+                                                                              int offset,
+                                                                              @RequestParam(value = "limit",
+                                                                                      defaultValue = "10")
+                                                                              int limit) {
+        Pageable pageRequest = PageRequest.of(offset, limit);
+
         if (color == null && size == null) {
-            List<Clothing> clothes = clothingService.findAllClothes();
+            Page<Clothing> clothes = clothingService.findAllClothes(pageRequest);
             return clothes.isEmpty()
                     ? ResponseEntity.noContent().build()
-                    : ResponseEntity.ok(clothes.stream().map(ClothingMapper::toResponseDto).toList());
+                    : ResponseEntity.ok(clothes.map(ClothingMapper::toResponseDto));
         }
 
         if (color == null || size == null) {
-            List<Clothing> clothes = clothingService.findByColorOrSize(color, size);
+            Page<Clothing> clothes = clothingService.findByColorOrSize(color, size, pageRequest);
             return clothes.isEmpty()
                     ? ResponseEntity.noContent().build()
-                    : ResponseEntity.ok(clothes.stream().map(ClothingMapper::toResponseDto).toList());
+                    : ResponseEntity.ok(clothes.map(ClothingMapper::toResponseDto));
         }
 
-        List<Clothing> clothes = clothingService.findByColorAndSize(color, size);
+        Page<Clothing> clothes = clothingService.findByColorAndSize(color, size, pageRequest);
         return clothes.isEmpty()
                 ? ResponseEntity.noContent().build()
-                : ResponseEntity.ok(clothes.stream().map(ClothingMapper::toResponseDto).toList());
+                : ResponseEntity.ok(clothes.map(ClothingMapper::toResponseDto));
     }
 
 }

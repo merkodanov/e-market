@@ -13,6 +13,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -44,40 +48,52 @@ class ClothingServiceTest {
     void getClothing_By_Color_And_Size_Is_Success() {
         List<String> color = List.of("blue", "red");
         List<String> size = List.of("small", "big");
-        List<ClothingSizeColor> clothingSizeColors = List.of(
+        int offset = 0;
+        int limit = 1;
+        Pageable pageable = PageRequest.of(offset, limit);
+        Page<ClothingSizeColor> clothingSizeColors = new PageImpl<>(List.of(
                 new ClothingSizeColor(new Clothing("title", "description", 1, 1),
-                        new Size(), new Color()));
+                        new Size(), new Color())));
         Mockito.when(clothingSizeColorRepository.findClothingSizeColorByColorNameInAndSizeNameIn(
-                color, size)).thenReturn(clothingSizeColors);
+                color, size, pageable)).thenReturn(clothingSizeColors);
 
-        List<Clothing> clothingList = clothingService.findByColorAndSize(color, size);
+        Page<Clothing> clothingList = clothingService.findByColorAndSize(color, size, pageable);
 
-        Assertions.assertEquals(clothingList.getFirst().getTitle(),
-                clothingSizeColors.getFirst().getClothing().getTitle());
+        Assertions.assertEquals(clothingList.getContent().getFirst().getTitle(),
+                clothingSizeColors.getContent().getFirst().getClothing().getTitle());
     }
 
     @Test
     void getAllClothing_Is_Success() {
         Clothing clothing = new Clothing("t", "d", 1, 1);
-        Mockito.when(clothingRepository.findAll()).thenReturn(List.of(clothing));
+        int offset = 0;
+        int limit = 1;
+        Pageable pageable = PageRequest.of(offset, limit);
+        Page<Clothing> clothingPage = new PageImpl<>(List.of(clothing));
+        Mockito.when(clothingRepository.findAll(pageable)).thenReturn(clothingPage);
 
-        List<Clothing> clothingList = clothingService.findAllClothes();
+        Page<Clothing> clothingList = clothingService.findAllClothes(pageable);
 
-        Assertions.assertEquals(clothing, clothingList.getFirst());
+        Assertions.assertEquals(clothing, clothingList.getContent().getFirst());
     }
 
     @Test
     void getClothing_By_Size_Or_Color_Is_Success() {
         List<String> color = List.of("blue");
-        List<ClothingSizeColor> clothingSizeColors = List.of(new ClothingSizeColor(
+        Page<ClothingSizeColor> clothingSizeColors = new PageImpl<>(List.of(new ClothingSizeColor(
                 new Clothing("t", "d", 1, 1),
                 new Size(), new Color()
-        ));
-        Mockito.when(clothingSizeColorRepository.findClothingSizeColorByColorNameInOrSizeNameIn(color, null))
+        )));
+        int offset = 0;
+        int limit = 1;
+        Pageable pageable = PageRequest.of(offset, limit);
+        Mockito.when(clothingSizeColorRepository
+                        .findClothingSizeColorByColorNameInOrSizeNameIn(color, null, pageable))
                 .thenReturn(clothingSizeColors);
 
-        List<Clothing> clothing = clothingService.findByColorOrSize(color, null);
+        Page<Clothing> clothing = clothingService.findByColorOrSize(color, null, pageable);
 
-        Assertions.assertEquals(clothingSizeColors.getFirst().getClothing(), clothing.getFirst());
+        Assertions.assertEquals(clothingSizeColors.getContent().getFirst().getClothing(),
+                clothing.getContent().getFirst());
     }
 }

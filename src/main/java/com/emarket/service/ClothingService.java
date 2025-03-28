@@ -5,9 +5,10 @@ import com.emarket.model.ClothingSizeColor;
 import com.emarket.repository.ClothingRepository;
 import com.emarket.repository.ClothingSizeColorRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,25 +22,22 @@ public class ClothingService {
         return clothingRepository.findById(id);
     }
 
-    public List<Clothing> findByColorAndSize(List<String> color, List<String> size) {
-        List<ClothingSizeColor> clothingSizeColorList = clothingSizeColorRepository.
-                findClothingSizeColorByColorNameInAndSizeNameIn(color, size);
 
-        return clothingSizeColorList.stream().map(ClothingSizeColor::getClothing).toList();
+    public Page<Clothing> findAllClothes(Pageable pageable) {
+        return clothingRepository.findAll(pageable);
     }
 
-    public List<Clothing> findAllClothes() {
-        List<Clothing> clothing = new ArrayList<>();
-        Iterable<Clothing> clothingIterable = clothingRepository.findAll();
-        clothingIterable.forEach(clothing::add);
+    public Page<Clothing> findByColorAndSize(List<String> color, List<String> size, Pageable pageable) {
+        Page<ClothingSizeColor> clothingSizeColorList = clothingSizeColorRepository.
+                findClothingSizeColorByColorNameInAndSizeNameIn(color, size, pageable);
 
-        return clothing;
+        return clothingSizeColorList.map(ClothingSizeColor::getClothing);
     }
 
-    public List<Clothing> findByColorOrSize(List<String> color, List<String> size) {
-        List<ClothingSizeColor> clothingSizeColors = clothingSizeColorRepository
-                .findClothingSizeColorByColorNameInOrSizeNameIn(color, size);
+    public Page<Clothing> findByColorOrSize(List<String> color, List<String> size, Pageable pageable) {
+        Page<ClothingSizeColor> clothingSizeColors = clothingSizeColorRepository
+                .findClothingSizeColorByColorNameInOrSizeNameIn(color, size, pageable);
 
-        return clothingSizeColors.stream().map(ClothingSizeColor::getClothing).toList();
+        return clothingSizeColors.map(ClothingSizeColor::getClothing);
     }
 }
