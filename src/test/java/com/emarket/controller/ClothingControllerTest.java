@@ -7,6 +7,7 @@ import com.emarket.service.ClothingService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -187,5 +188,23 @@ class ClothingControllerTest {
         mockMvc.perform(get("/clothes")
                         .param("color", String.join(",", color)))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void getClothes_Offset_Below_Zero_Is_Bad_Request() {
+        Assertions.assertThrows(ServletException.class, () -> mockMvc.perform(get("/clothes")
+                .param("offset", "-1")));
+    }
+
+    @Test
+    void getClothes_Limit_Below_1_Is_Bad_Request() {
+        Assertions.assertThrows(ServletException.class, () -> mockMvc.perform(get("/clothes")
+                .param("limit", "0")));
+    }
+
+    @Test
+    void getClothes_Offset_Above_100_Is_Bad_Request() {
+        Assertions.assertThrows(ServletException.class, () -> mockMvc.perform(get("/clothes")
+                .param("offset", "101")));
     }
 }
