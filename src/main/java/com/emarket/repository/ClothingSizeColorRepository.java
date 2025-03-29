@@ -8,8 +8,10 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.List;
 
 public interface ClothingSizeColorRepository extends CrudRepository<ClothingSizeColor, Long> {
-    Page<ClothingSizeColor> findClothingSizeColorByColorNameInAndSizeNameIn(List<String> color, List<String> size, Pageable pageable);
+    Page<ClothingSizeColor> findClothingSizeColorByColorNameInAndSizeNameIn(List<String> color, List<String> size,
+                                                                            Pageable pageable);
 
-    Page<ClothingSizeColor> findClothingSizeColorByColorNameInOrSizeNameIn(List<String> color, List<String> size, Pageable pageable);
+    Page<ClothingSizeColor> findClothingSizeColorByColorNameInOrSizeNameIn(List<String> color, List<String> size,
+                                                                           Pageable pageable);
 
 }
