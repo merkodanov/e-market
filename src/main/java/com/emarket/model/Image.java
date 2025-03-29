@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Entity
 @Data
-public class CardImage {
+public class Image {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
