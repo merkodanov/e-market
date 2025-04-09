@@ -16,4 +16,13 @@ public class Color {
     private String name;
 
     private String code;
+
+    public Color() {
+
+    }
+
+    public Color(String name, String code) {
+        this.name = name;
+        this.code = code;
+    }
 }
